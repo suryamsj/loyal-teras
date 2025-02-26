@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+@theme{
+  --color-primary-blue: oklch(61.79% 0.1668 250.87);
+  --color-primary-yellow: oklch(81.79% 0.1705 77.95);
+  --color-secondary-gray: oklch(97.02% 0 0);
+  --color-secondary-orange: oklch(74.53% 0.175886 59.3675);
+
+  --color-status-success: oklch(62.91% 0.1543 144.2);
+  --color-status-error: oklch(60.83% 0.209 27.03);
+  --color-status-warning: oklch(74.53% 0.175886 59.3675);
+
+  --color-netral-white: oklch(100% 0 0);
+  --color-netral-gray: oklch(90.67% 0 0);
+  --color-netral-dark: oklch(30.87% 0.0195 229.78);
+}
