@@ -25,7 +25,7 @@
 	/>
 </svelte:head>
 
-<div class="flex-1 overflow-auto bg-gray-50 p-4 sm:space-y-4 md:p-6">
+<div class="flex-1 space-y-4 overflow-auto bg-gray-50 p-4 sm:space-y-6 md:p-6">
 	<div class="flex w-full flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
 		<div class="flex flex-col space-y-2">
 			<h1 class="text-2xl font-semibold text-gray-800">Smart Segmentation</h1>
@@ -95,7 +95,7 @@
 								<td class="px-6 py-4 text-sm text-gray-500">{segment.lastUpdated}</td>
 								<td class="flex space-x-2 px-6 py-4 text-sm">
 									<a
-										href="/dashboard/smart-segmentation/{uuidv4()}"
+										href="/dashboard/smart-segmentation/edit/{uuidv4()}"
 										class="text-gray-500 hover:text-gray-700"
 										aria-label="Edit"
 									>
@@ -115,7 +115,7 @@
 										</svg>
 									</a>
 									<a
-										href="/dashboard/smart-segmentation/{uuidv4()}/analytics"
+										href="/dashboard/smart-segmentation/analytic/{uuidv4()}"
 										class="text-gray-500 hover:text-gray-700"
 										aria-label="View Analytics"
 									>

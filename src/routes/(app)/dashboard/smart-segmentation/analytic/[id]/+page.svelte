@@ -43,7 +43,7 @@
 	/>
 </svelte:head>
 
-<div class="flex-1 overflow-auto bg-gray-50 p-4 sm:space-y-4 md:p-6">
+<div class="flex-1 space-y-4 overflow-auto bg-gray-50 p-4 sm:space-y-6 md:p-6">
 	<div class="flex w-full flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
 		<div class="flex flex-col space-y-2">
 			<h1 class="text-2xl font-semibold text-gray-800">

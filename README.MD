@@ -2,8 +2,7 @@
 
 ## Halaman Yang Belum
 
-- Tiers (baru halaman depan)
-- Interactive Suite
+- Interactive Suite (baru sebagian)
 - Teras AI
 
 ## Hal Yang Perlu Dibuat
