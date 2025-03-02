@@ -58,7 +58,7 @@
 
 	<div class="flex flex-col gap-4 sm:flex-row sm:gap-3">
 		<a
-			href="/"
+			href="/dashboard/interaction-suite/create"
 			class="hover:bg-opacity-90 flex cursor-pointer items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-center text-white shadow-md transition-colors"
 			>Create New Campaign</a
 		>
@@ -68,9 +68,19 @@
 			>Campaign Settings</a
 		>
 		<a
-			href="/"
+			href="/dashboard/interaction-suite/automated-reports"
 			class="hover:bg-opacity-90 flex cursor-pointer items-center gap-2 rounded-md border-1 border-gray-300 px-4 py-2 text-center shadow-md transition-colors"
 			>View Automated Reports</a
+		>
+		<a
+			href="/dashboard/interaction-suite/ai-generated-campaigns"
+			class="hover:bg-opacity-90 flex cursor-pointer items-center gap-2 rounded-md border-1 border-gray-300 px-4 py-2 text-center shadow-md transition-colors"
+			>AI Generated Campaigns</a
+		>
+		<a
+			href="/dashboard/interaction-suite/optimize"
+			class="hover:bg-opacity-90 flex cursor-pointer items-center gap-2 rounded-md border-1 border-gray-300 px-4 py-2 text-center shadow-md transition-colors"
+			>Failed Campaigns</a
 		>
 	</div>
 

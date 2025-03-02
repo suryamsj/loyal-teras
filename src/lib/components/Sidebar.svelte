@@ -9,7 +9,7 @@
 		{ name: 'Smart Segmentation', icon: 'smartsegmen', path: '/dashboard/smart-segmentation' },
 		{ name: 'Tiers', icon: 'tier', path: '/dashboard/tiers' },
 		{ name: 'Interaction Suite', icon: 'interactsuite', path: '/dashboard/interaction-suite' },
-		{ name: 'TerasAI', icon: 'bar-chart-2', path: '/dashboard/terasai' }
+		{ name: 'TerasAI', icon: 'bar-chart-2', path: '/dashboard/teras-ai' }
 	];
 
 	let pathname = $derived(page.url.pathname);
