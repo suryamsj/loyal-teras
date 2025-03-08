@@ -1,30 +1,45 @@
 <script lang="ts">
-	let messageCount = $state(0);
-	let totalMessages = $state(2000);
-	let inputText = $state('');
+	import { writable } from 'svelte/store';
+	
+	let messageCount = writable(0);
+	let totalMessages = writable(2000);
+	let inputText = writable('');
+	let messages = writable<{ role: string, content: string }[]>([]);
 
-	function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+	async function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const text = event.currentTarget.value;
-		inputText = text;
-		messageCount = text.length;
+		inputText.set(text);
+		messageCount.set(text.length);
 	}
 
-	function sendMessage() {
-		if (inputText.trim()) {
-			inputText = '';
-			messageCount = 0;
+	async function sendMessage() {
+		if ($inputText.trim()) {
+			messages.update(msgs => [...msgs, { role: 'user', content: $inputText }]);
+
+			const response = await fetch('/api/terasai', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ query: $inputText })
+			});
+			const data = await response.json();
+			const formattedResponse = formatResponse(data.answer);
+
+			messages.update(msgs => [...msgs, { role: 'ai', content: formattedResponse }]);
+
+			inputText.set('');
+			messageCount.set(0);
 		}
 	}
 
-	$effect(() => {
-		if (messageCount >= totalMessages) {
-			alert('You have reached the maximum message limit.');
-		}
+	function formatResponse(text: string): string {
+		return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+	}
 
-		return () => {
-			// Cleanup
-		};
-	});
+	$: if ($messageCount >= $totalMessages) {
+		alert('You have reached the maximum message limit.');
+	}
 </script>
 
 <svelte:head>
@@ -162,6 +177,13 @@
 					>
 				</button>
 			</div>
+			<div class="chat-container w-full max-w-3xl">
+				{#each $messages as { role, content }}
+					<div class="chat-bubble {role}">
+						{@html content}
+					</div>
+				{/each}
+			</div>
 		</div>
 	</main>
 
@@ -174,6 +196,7 @@
 							type="text"
 							placeholder="Ask AI Question or Make Request..."
 							class="w-full rounded-lg border border-gray-200 py-3 pr-10 pl-4 transition focus:border-blue-200 focus:ring-2 focus:ring-blue-100 focus:outline-none"
+							bind:value={$inputText}
 							oninput={handleInput}
 							onkeypress={(e) => e.key === 'Enter' && sendMessage()}
 						/>
@@ -207,10 +230,11 @@
 						</select>
 					</div>
 					<div class="flex items-center">
-						<span class="mr-3 text-sm text-gray-500">{messageCount}/{totalMessages}</span>
+						<span class="mr-3 text-sm text-gray-500">{$messageCount}/{$totalMessages}</span>
 						<button
 							class="rounded-full bg-blue-500 p-2 text-white transition hover:bg-blue-600"
 							aria-label="Send"
+							onclick={sendMessage}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -231,3 +255,27 @@
 		</div>
 	</footer>
 </div>
+
+<style>
+	.chat-container {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.chat-bubble {
+		padding: 1rem;
+		border-radius: 1rem;
+		max-width: 75%;
+	}
+
+	.chat-bubble.user {
+		align-self: flex-end;
+		background-color: #e0f7fa;
+	}
+
+	.chat-bubble.ai {
+		align-self: flex-start;
+		background-color: #f1f1f1;
+	}
+</style>
