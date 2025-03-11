@@ -1,9 +1,13 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
+
 	let messageCount = $state(0);
 	let totalMessages = $state(2000);
 	let inputText = $state('');
 	let messages = $state<{ role: string; content: string }[]>([]);
 	let loading = $state(false);
+
+	const url = dev ? 'http://localhost:5174' : 'https://loyalteras.vercel.app';
 
 	async function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const text = event.currentTarget.value;
@@ -16,7 +20,7 @@
 			loading = true;
 			messages = [...messages, { role: 'user', content: inputText }];
 
-			const response = await fetch('http://localhost:5174/api/terasai', {
+			const response = await fetch(`${url}/api/terasai`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
