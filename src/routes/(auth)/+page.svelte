@@ -51,7 +51,7 @@
 					type="text"
 					name="username"
 					id="username"
-					placeholder="Enter your username"
+					placeholder="admin"
 					class="focus:ring-primary-blue focus:border-primary-blue w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:ring-2 {form
 						?.errors?.username
 						? 'border-red-500 focus:border-red-500 focus:ring-red-500'
@@ -68,7 +68,7 @@
 					type="password"
 					name="password"
 					id="password"
-					placeholder="Enter your password"
+					placeholder="admin"
 					class="focus:ring-primary-blue focus:border-primary-blue w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:ring-2 {form
 						?.errors?.password
 						? 'border-red-500 focus:border-red-500 focus:ring-red-500'

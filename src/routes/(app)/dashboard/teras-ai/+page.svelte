@@ -1,35 +1,36 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-	
-	let messageCount = writable(0);
-	let totalMessages = writable(2000);
-	let inputText = writable('');
-	let messages = writable<{ role: string, content: string }[]>([]);
+	let messageCount = $state(0);
+	let totalMessages = $state(2000);
+	let inputText = $state('');
+	let messages = $state<{ role: string; content: string }[]>([]);
+	let loading = $state(false);
 
 	async function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const text = event.currentTarget.value;
-		inputText.set(text);
-		messageCount.set(text.length);
+		inputText = text;
+		messageCount = text.length;
 	}
 
 	async function sendMessage() {
-		if ($inputText.trim()) {
-			messages.update(msgs => [...msgs, { role: 'user', content: $inputText }]);
+		if (inputText.trim()) {
+			loading = true;
+			messages = [...messages, { role: 'user', content: inputText }];
 
-			const response = await fetch('/api/terasai', {
+			const response = await fetch('http://localhost:5174/api/terasai', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ query: $inputText })
+				body: JSON.stringify({ query: inputText })
 			});
 			const data = await response.json();
 			const formattedResponse = formatResponse(data.answer);
 
-			messages.update(msgs => [...msgs, { role: 'ai', content: formattedResponse }]);
+			messages = [...messages, { role: 'ai', content: formattedResponse }];
 
-			inputText.set('');
-			messageCount.set(0);
+			inputText = '';
+			messageCount = 0;
+			loading = false;
 		}
 	}
 
@@ -37,9 +38,11 @@
 		return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
 	}
 
-	$: if ($messageCount >= $totalMessages) {
-		alert('You have reached the maximum message limit.');
-	}
+	$effect(() => {
+		if (messageCount >= totalMessages) {
+			alert('You have reached the maximum message limit.');
+		}
+	});
 </script>
 
 <svelte:head>
@@ -108,77 +111,80 @@
 		class="flex flex-1 flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 p-8"
 	>
 		<div class="flex w-full max-w-3xl flex-col items-center">
-			<div class="mb-10 rounded-full bg-blue-50 p-4 text-blue-500 shadow-sm">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="28"
-					height="28"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					><path d="M20 12v10H4V12" /><path d="M2 7h20v5H2z" /><path d="M12 22V7" /><path
-						d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"
-					/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg
-				>
-			</div>
+			{#if messages.length === 0}
+				<div class="mb-10 rounded-full bg-blue-50 p-4 text-blue-500 shadow-sm">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="28"
+						height="28"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><path d="M20 12v10H4V12" /><path d="M2 7h20v5H2z" /><path d="M12 22V7" /><path
+							d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"
+						/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg
+					>
+				</div>
 
-			<h1 class="mb-4 text-center text-3xl font-light text-gray-800">
-				Optimize Your Loyalty Strategy <span class="font-semibold">with AI</span>
-			</h1>
-			<p class="mb-12 max-w-xl text-center text-gray-600">
-				Ask anything about customer segmentation, campaign optimization, and AI-powered insights to
-				enhance your loyalty program.
-			</p>
+				<h1 class="mb-4 text-center text-3xl font-light text-gray-800">
+					Optimize Your Loyalty Strategy <span class="font-semibold">with AI</span>
+				</h1>
+				<p class="mb-12 max-w-xl text-center text-gray-600">
+					Ask anything about customer segmentation, campaign optimization, and AI-powered insights
+					to enhance your loyalty program.
+				</p>
 
-			<div class="mb-12 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-				<button
-					class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
-				>
-					<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
-						>Group customers based on behavior, demographics, or location</span
+				<div class="mb-12 grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+					<button
+						class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
 					>
-				</button>
-				<button
-					class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
-				>
-					<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
-						>Identify similar customers and exclude irrelevant ones</span
+						<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
+							>Group customers based on behavior, demographics, or location</span
+						>
+					</button>
+					<button
+						class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
 					>
-				</button>
-				<button
-					class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
-				>
-					<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
-						>Get AI-driven insights on customer behavior and future trends</span
+						<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
+							>Identify similar customers and exclude irrelevant ones</span
+						>
+					</button>
+					<button
+						class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
 					>
-				</button>
-				<button
-					class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
-				>
-					<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
-						>Analyze and improve the effectiveness of loyalty rewards</span
+						<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
+							>Get AI-driven insights on customer behavior and future trends</span
+						>
+					</button>
+					<button
+						class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
 					>
-				</button>
-				<button
-					class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
-				>
-					<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
-						>Let AI manage and optimize your marketing campaigns</span
+						<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
+							>Analyze and improve the effectiveness of loyalty rewards</span
+						>
+					</button>
+					<button
+						class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
 					>
-				</button>
-				<button
-					class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
-				>
-					<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
-						>Set up automated incentives for birthdays and special occasions</span
+						<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
+							>Let AI manage and optimize your marketing campaigns</span
+						>
+					</button>
+					<button
+						class="group rounded-lg border border-gray-100 bg-white p-4 text-left shadow-sm transition duration-300 hover:border-blue-100 hover:shadow-md"
 					>
-				</button>
-			</div>
+						<span class="text-gray-700 transition duration-300 group-hover:text-gray-900"
+							>Set up automated incentives for birthdays and special occasions</span
+						>
+					</button>
+				</div>
+			{/if}
+
 			<div class="chat-container w-full max-w-3xl">
-				{#each $messages as { role, content }}
+				{#each messages as { role, content }}
 					<div class="chat-bubble {role}">
 						{@html content}
 					</div>
@@ -195,8 +201,11 @@
 						<input
 							type="text"
 							placeholder="Ask AI Question or Make Request..."
-							class="w-full rounded-lg border border-gray-200 py-3 pr-10 pl-4 transition focus:border-blue-200 focus:ring-2 focus:ring-blue-100 focus:outline-none"
-							bind:value={$inputText}
+							class="w-full rounded-lg border border-gray-200 py-3 pr-10 pl-4 transition focus:border-blue-200 focus:ring-2 focus:ring-blue-100 focus:outline-none {loading
+								? 'cursor-not-allowed'
+								: ''}"
+							disabled={loading}
+							bind:value={inputText}
 							oninput={handleInput}
 							onkeypress={(e) => e.key === 'Enter' && sendMessage()}
 						/>
@@ -230,11 +239,14 @@
 						</select>
 					</div>
 					<div class="flex items-center">
-						<span class="mr-3 text-sm text-gray-500">{$messageCount}/{$totalMessages}</span>
+						<span class="mr-3 text-sm text-gray-500">{messageCount}/{totalMessages}</span>
 						<button
-							class="rounded-full bg-blue-500 p-2 text-white transition hover:bg-blue-600"
+							class="rounded-full bg-blue-500 p-2 text-white transition hover:bg-blue-600 {loading
+								? 'cursor-not-allowed'
+								: ''}"
 							aria-label="Send"
 							onclick={sendMessage}
+							disabled={loading}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -255,27 +267,3 @@
 		</div>
 	</footer>
 </div>
-
-<style>
-	.chat-container {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.chat-bubble {
-		padding: 1rem;
-		border-radius: 1rem;
-		max-width: 75%;
-	}
-
-	.chat-bubble.user {
-		align-self: flex-end;
-		background-color: #e0f7fa;
-	}
-
-	.chat-bubble.ai {
-		align-self: flex-start;
-		background-color: #f1f1f1;
-	}
-</style>

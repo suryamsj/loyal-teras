@@ -32,3 +32,7 @@ export type ActivityItem = {
   customer: string;
   time: string;
 };
+
+export type User = {
+  name: string
+}
